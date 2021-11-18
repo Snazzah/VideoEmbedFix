@@ -9,9 +9,9 @@ A Cloudflare worker that fixes embeds for some services in Discord and Telegram,
 - Coub
 
 # Usage
-Just put `https://vef.snaz.in/` before a URL to embed it in a chat app.
+Just put `https://vef.snaz.in/` before a URL to embed it in a chat app. (Works with or without `https://`)
 
-Example: **`https://vef.snaz.in/`**`https://twitter.com/real1gaming/status/1419088267480158210`
+Example: **`https://vef.snaz.in/`**`twitter.com/real1gaming/status/1419088267480158210`
 
 | Website | Preview Image |
 |:-:|:-:|
