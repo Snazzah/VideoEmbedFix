@@ -7,6 +7,7 @@ A Cloudflare worker that fixes embeds for some services in Discord and Telegram,
 - Twitter
 - ~~TikTok~~
 - Coub
+- Vine
 
 # Usage
 Just put `https://vef.snaz.in/` before a URL to embed it in a chat app. (Works with or without `https://`)
