@@ -1,5 +1,5 @@
 # VideoEmbedFix
-A Cloudflare worker thar fixes embeds for some services in Discord and Telegram, similar to [TwitFix](https://github.com/robinuniverse/TwitFix).
+A Cloudflare worker that fixes embeds for some services in Discord and Telegram, similar to [TwitFix](https://github.com/robinuniverse/TwitFix).
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Snazzah/VideoEmbedFix)
 
