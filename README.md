@@ -13,3 +13,7 @@ Just put `https://vef.snaz.in/` before a URL to embed it in a chat app.
 
 Example: **`https://vef.snaz.in/`**`https://twitter.com/real1gaming/status/1419088267480158210`
 
+| Website | Preview Image |
+|:-:|:-:|
+| Discord | ![](https://get.snaz.in/2RGPqZ8.png) |
+| Telegram | ![](https://get.snaz.in/3NTNJX9.png) |
