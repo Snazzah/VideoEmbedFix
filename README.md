@@ -1,0 +1,15 @@
+# VideoEmbedFix
+A Cloudflare worker thar fixes embeds for some services in Discord and Telegram, similar to [TwitFix](https://github.com/robinuniverse/TwitFix).
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Snazzah/VideoEmbedFix)
+
+### Services Supported
+- Twitter
+- ~~TikTok~~
+- Coub
+
+# Usage
+Just put `https://vef.snaz.in/` before a URL to embed it in a chat app.
+
+Example: **`https://vef.snaz.in/`**`https://twitter.com/real1gaming/status/1419088267480158210`
+
