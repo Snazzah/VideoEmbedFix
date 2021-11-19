@@ -57,10 +57,15 @@ export const extract: Provider['extract'] = async (match, url, _, debug) => {
   const status = await tweetResponse.json();
   console.log(status);
 
+  let tweetContent = status.full_text?.replace(/\n/g, ' ') || '';
+  if (status.entities?.urls && tweetContent) {
+    for (const url of status.entities.urls) tweetContent = tweetContent.replace(url.url, url.expanded_url);
+  }
+
   const partialResult = {
     user: status.user.name ? `${status.user.name} (@${status.user.screen_name})` : `@${status.user.screen_name}`,
-    title: status.full_text?.replace(/\n/g, ' ') || '',
-    description: status.full_text?.replace(/\n/g, ' ') || '',
+    title: tweetContent,
+    description: tweetContent,
     url,
     themeColor: '#1da0f2'
   };
