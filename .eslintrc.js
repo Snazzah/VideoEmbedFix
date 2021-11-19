@@ -8,7 +8,8 @@ module.exports = {
   globals: {
     FetchEvent: true,
     RequestInit: true,
-    VIDEMBED_CACHE: true
+    KVNamespace: true,
+    VEF_CACHE: true
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {

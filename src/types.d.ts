@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-undef
-declare const VIDEMBED_CACHE: KVNamespace;
+declare const VEF_CACHE: KVNamespace;
 
 export interface Provider {
   title: string;
@@ -9,7 +8,8 @@ export interface Provider {
     match: RegExpExecArray,
     url: string,
     event: FetchEvent,
-    debug: boolean
+    debug: boolean,
+    hostURL: URL
   ): Promise<ProviderResponse | Response | null>;
 }
 

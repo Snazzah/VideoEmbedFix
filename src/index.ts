@@ -2,6 +2,8 @@ import { providers } from './providers';
 import { Provider, ProviderResponse } from './types';
 import { redirectDebug } from './util';
 import { html } from 'common-tags';
+import { getData as getTikTokData } from './providers/tiktok';
+declare const VEF_CACHE: KVNamespace;
 
 const embedServiceUserAgents = [
   'Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)',
@@ -24,68 +26,10 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
   let finalURL = url.pathname.replace(/^\/+/, '');
   let debugMode = false;
 
-  // Index
-  if (url.pathname === '/') {
-    if (userAgent && embedServiceUserAgents.includes(userAgent))
-      return new Response(
-        `<!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <title>${serviceName}</title>
-              <meta content="${serviceName}" property="og:title" />
-              <meta
-                content="${[
-                  'VideoEmbedFix is a service that fixes embeds for various services in Discord and Telegram.',
-                  'Created by Snazzah (snazzah.com), inspired by TwitFix by robinuniverse.',
-                  '',
-                  'Click here to redirect to the GitHub repo!'
-                ].join('\n')}"
-                property="og:description"
-              />
-              <meta content="${repoURL}" property="og:url" />
-              <meta content="#fc2929" data-react-helmet="true" name="theme-color" />
-              <meta http-equiv="refresh" content="0; url=${repoURL}" />
-            </head>
-            <body>
-              Redirecting you to this service's Github Repository: <a href="${repoURL}">${repoURL}</a>
-            </body>
-          </html>`,
-        {
-          headers: {
-            'content-type': 'text/html;charset=UTF-8'
-          }
-        }
-      );
-    else return Response.redirect(repoURL, 301);
-  }
-
-  // oembed.json
-  if (url.pathname === '/oembed.json') {
-    const title = url.searchParams.get('t');
-    const user = url.searchParams.get('u');
-    const videoLink = url.searchParams.get('l');
-    const service = url.searchParams.get('s');
-
-    return new Response(
-      JSON.stringify({
-        type: 'video',
-        version: '1.0',
-        provider_name: `${service} (via VideoEmbedFix)`,
-        provider_url: 'https://github.com/Snazzah/VideoEmbedFix',
-        title,
-        url: videoLink,
-        author_name: user,
-        author_url: videoLink
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-  }
-
-  // Health check route
+  if (url.pathname === '/') return indexRoute(userAgent);
+  if (url.pathname === '/oembed.json') return oembedRoute(url);
+  if (url.pathname === '/tiktokvideo') return tiktokVideoRoute(url);
+  if (url.pathname.startsWith('/_tiktok')) return tiktokRoute(url);
   if (url.pathname === '/health')
     return new Response('OK', {
       headers: {
@@ -122,7 +66,7 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
       if (!match) return redirectDebug(`Failed to match URL (${provider.title}, ${finalURL})}`, finalURL, debugMode);
 
       try {
-        const response = await provider.extract(match, destURL.toString(), event, debugMode);
+        const response = await provider.extract(match, destURL.toString(), event, debugMode, url);
         if (!response)
           return redirectDebug(`Provider gave a null response (${provider.title}, ${finalURL})}`, finalURL, debugMode);
 
@@ -142,6 +86,126 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
     console.log(e);
     return redirectDebug(`Failed to extract (${finalURL}): ${(e as Error).toString()}`, finalURL, debugMode);
   }
+}
+
+function indexRoute(userAgent: string | null): Response {
+  if (userAgent && embedServiceUserAgents.includes(userAgent))
+    return new Response(
+      `<!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <title>${serviceName}</title>
+            <meta content="${serviceName}" property="og:title" />
+            <meta
+              content="${[
+                'VideoEmbedFix is a service that fixes embeds for various services in Discord and Telegram.',
+                'Created by Snazzah (snazzah.com), inspired by TwitFix by robinuniverse.',
+                '',
+                'Click here to redirect to the GitHub repo!'
+              ].join('\n')}"
+              property="og:description"
+            />
+            <meta content="${repoURL}" property="og:url" />
+            <meta content="#fc2929" data-react-helmet="true" name="theme-color" />
+            <meta http-equiv="refresh" content="0; url=${repoURL}" />
+          </head>
+          <body>
+            Redirecting you to this service's Github Repository: <a href="${repoURL}">${repoURL}</a>
+          </body>
+        </html>`,
+      {
+        headers: {
+          'content-type': 'text/html;charset=UTF-8'
+        }
+      }
+    );
+  else return Response.redirect(repoURL, 301);
+}
+
+function oembedRoute(url: URL): Response {
+  const title = url.searchParams.get('t');
+  const user = url.searchParams.get('u');
+  const videoLink = url.searchParams.get('l');
+  const service = url.searchParams.get('s');
+
+  return new Response(
+    JSON.stringify({
+      type: 'video',
+      version: '1.0',
+      provider_name: `${service} (via ${serviceName})`,
+      provider_url: repoURL,
+      title,
+      url: videoLink,
+      author_name: user,
+      author_url: videoLink
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+}
+
+async function tiktokVideoRoute(url: URL): Promise<Response> {
+  const videoLink = url.searchParams.get('l');
+  if (!videoLink) return new Response('No video link provided', { status: 400 });
+
+  const videoURL = new URL(videoLink);
+  if (!videoURL.hostname.endsWith('.tiktok.com')) return new Response('Invalid host', { status: 400 });
+
+  const response = await fetch(videoLink, {
+    headers: {
+      accept: '*/*',
+      referer: videoLink
+    },
+    cf: {
+      cacheTtl: 600,
+      cacheEverything: true
+    }
+  });
+
+  if (!response.ok) return new Response('Failed to fetch video', { status: response.status });
+
+  return response;
+}
+
+async function tiktokRoute(url: URL): Promise<Response> {
+  const [, , user, videoId] = url.pathname.split('/');
+  if (!user || !videoId) return new Response('No user or video ID provided', { status: 400 });
+
+  async function fetchVideo(videoLink: string): Promise<Response> {
+    const response = await fetch(videoLink, {
+      headers: {
+        accept: '*/*',
+        referer: videoLink
+      },
+      cf: { cacheTtl: 600 }
+    });
+
+    if (!response.ok) return new Response('Failed to fetch video', { status: response.status });
+
+    await cache.put(cacheKey, response.clone());
+    return response;
+  }
+
+  // Check if the video is cached
+  const cache = await caches.open('tiktok');
+  const cacheKey = new Request(`https://www.tiktok.com/@${user}/video/${videoId}`);
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
+
+  // Check the KV store for the video
+  const video = await VEF_CACHE.get(`tiktok:${user}:${videoId}`);
+  if (video) return fetchVideo(video);
+
+  // Fetch the video (probably will fail)
+  const data = await getTikTokData(user, videoId);
+  if (!data) return new Response('Body match failed', { status: 500 });
+  if (data.props.pageProps.statusCode === 10216) return new Response('Video is private', { status: 400 });
+
+  const videoLink = data.props.pageProps.itemInfo.itemStruct.video.playAddr;
+  return fetchVideo(videoLink);
 }
 
 function embedResponse(event: FetchEvent, result: ProviderResponse, provider: Provider): Response {
