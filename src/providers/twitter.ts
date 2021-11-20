@@ -1,4 +1,4 @@
-import { Provider } from '../types';
+import { Provider, VEF_CACHE } from '../types';
 import { fetchAndCache, redirectDebug } from '../util';
 
 export const title = 'Twitter';
@@ -23,8 +23,9 @@ async function extractFromVMap(vmapUrl: string) {
   return decodeURIComponent(match[1]);
 }
 
-export const extract: Provider['extract'] = async (match, url, _, debug) => {
-  const [, statusId] = match;
+async function getGuestToken(): Promise<string> {
+  const cached = await VEF_CACHE.get('twitter:guest_token');
+  if (cached) return cached;
   const [tokenResponse] = await fetchAndCache('https://api.twitter.com/1.1/guest/activate.json', {
     method: 'POST',
     headers: {
@@ -33,6 +34,13 @@ export const extract: Provider['extract'] = async (match, url, _, debug) => {
     }
   });
   const token = await tokenResponse.json();
+  await VEF_CACHE.put('twitter:guest_token', token.guest_token, { expirationTtl: 60 * 60 * 24 * 7 });
+  return token.guest_token;
+}
+
+export const extract: Provider['extract'] = async (match, url, _, debug) => {
+  const [, statusId] = match;
+  const token = await getGuestToken();
   console.log(token);
 
   const query = new URLSearchParams({
@@ -49,7 +57,7 @@ export const extract: Provider['extract'] = async (match, url, _, debug) => {
       headers: {
         Authorization:
           'Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw',
-        'x-guest-token': token.guest_token
+        'x-guest-token': token
       }
     }
   );
