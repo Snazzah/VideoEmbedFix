@@ -1,5 +1,6 @@
-import { Provider, VEF_CACHE } from '../types';
+import { Provider } from '../types';
 import { fetchAndCache, redirectDebug } from '../util';
+declare const VEF_CACHE: KVNamespace;
 
 export const title = 'Twitter';
 export const domains = [
