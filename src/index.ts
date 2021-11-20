@@ -24,7 +24,7 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
   let finalURL = url.pathname.replace(/^\/+/, '');
   let debugMode = false;
 
-  if (url.pathname === '/') return indexRoute(userAgent);
+  if (url.pathname === '/') return indexRoute(event, userAgent);
   if (url.pathname === '/oembed.json') return oembedRoute(url);
   if (url.pathname === '/tiktokvideo') return tiktokVideoRoute(url);
   if (url.pathname.startsWith('/_tiktok')) return tiktokRoute(url);
@@ -86,7 +86,9 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
   }
 }
 
-function indexRoute(userAgent: string | null): Response {
+function indexRoute(event: FetchEvent, userAgent: string | null): Response {
+  const isTelegram = event.request.headers.get('User-Agent')?.includes('TelegramBot');
+
   if (userAgent && embedServiceUserAgents.includes(userAgent))
     return new Response(
       `<!DOCTYPE html>
@@ -104,6 +106,7 @@ function indexRoute(userAgent: string | null): Response {
               property="og:description"
             />
             <meta content="${repoURL}" property="og:url" />
+            <meta content="https://get.snaz.in/${isTelegram ? '8FQNoHn' : '5s2KegP'}.png" property="og:image">
             <meta content="#fc2929" data-react-helmet="true" name="theme-color" />
             <meta http-equiv="refresh" content="0; url=${repoURL}" />
           </head>
