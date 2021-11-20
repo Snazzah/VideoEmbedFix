@@ -16,8 +16,6 @@ const disableCache = false;
 const serviceName = 'VideoEmbedFix';
 const repoURL = 'https://github.com/Snazzah/VideoEmbedFix';
 
-// #1da0f2
-
 async function handleRequest(event: FetchEvent): Promise<Response> {
   if (event.request.method !== 'GET') return new Response('Server only supports GET requests.', { status: 405 });
 
@@ -273,10 +271,11 @@ async function cacheResponse(url: string, fn: () => Promise<Response>): Promise<
   if (cached) return cached;
 
   const response = await fn();
-  if (response.status !== 301 && response.status !== 302) {
-    response.headers.append('Cache-Control', 's-maxage=300');
-    await cache.put(cacheKey, response.clone());
-  }
+  const cacheResponse = response.clone();
+  try {
+    cacheResponse.headers.set('cache-control', 'public, no-transform, max-age=86400');
+  } catch (e) {}
+  await cache.put(cacheKey, cacheResponse);
   return response;
 }
 

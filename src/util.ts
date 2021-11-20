@@ -58,6 +58,8 @@ export async function fetchAndCache(
   const cached = await cache.match(cacheKey);
   if (cached) return [cached, uncache];
   const response = await fetch(url, options);
-  await cache.put(cacheKey, response.clone());
+  const cacheResponse = response.clone();
+  cacheResponse.headers.set('cache-control', 'public, no-transform, max-age=86400');
+  await cache.put(cacheKey, cacheResponse);
   return [response, uncache];
 }
