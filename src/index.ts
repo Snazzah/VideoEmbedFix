@@ -106,7 +106,7 @@ function indexRoute(event: FetchEvent, userAgent: string | null): Response {
               property="og:description"
             />
             <meta content="${repoURL}" property="og:url" />
-            <meta content="https://get.snaz.in/${isTelegram ? '8FQNoHn' : '5s2KegP'}.png" property="og:image">
+            <meta content="https://get.snaz.in/${isTelegram ? '8rEHmgH' : '9BVtA8t'}.png" property="og:image">
             <meta content="#fc2929" data-react-helmet="true" name="theme-color" />
             <meta http-equiv="refresh" content="0; url=${repoURL}" />
           </head>
