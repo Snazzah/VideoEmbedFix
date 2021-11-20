@@ -272,13 +272,17 @@ async function cacheResponse(url: string, fn: () => Promise<Response>): Promise<
   const cacheKey = new Request(url);
   const cache = caches.default;
   const cached = await cache.match(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    console.log(`Using cached response ${url} (${cached.status})`);
+    return cached;
+  }
 
   const response = await fn();
   const cacheResponse = response.clone();
   try {
     cacheResponse.headers.set('cache-control', 'public, no-transform, max-age=86400');
   } catch (e) {}
+  console.log(`Caching response ${url} (${cacheResponse.status})`);
   await cache.put(cacheKey, cacheResponse);
   return response;
 }

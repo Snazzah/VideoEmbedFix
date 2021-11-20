@@ -34,7 +34,8 @@ async function getGuestToken(): Promise<string> {
         'Bearer AAAAAAAAAAAAAAAAAAAAAPYXBAAAAAAACLXUNDekMxqa8h%2F40K4moUkGsoc%3DTYfbDKbT3jJPCEVnMYqilB28NHfOPqkca3qaAxGfsyKCs0wRbw'
     }
   });
-  const token = await tokenResponse.json();
+  const token: { guest_token: string } = await tokenResponse.json();
+  console.log(`Got new guest token (${token.guest_token})`);
   await VEF_CACHE.put('twitter:guest_token', token.guest_token, { expirationTtl: 60 * 60 * 24 * 7 });
   return token.guest_token;
 }
@@ -63,7 +64,7 @@ export const extract: Provider['extract'] = async (match, url, _, debug) => {
     }
   );
 
-  const status = await tweetResponse.json();
+  const status: any = await tweetResponse.json();
   console.log(status);
 
   let tweetContent = status.full_text?.replace(/\n/g, ' ') || '';

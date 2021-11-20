@@ -9,7 +9,7 @@ export const regex =
 export const extract: Provider['extract'] = async (match) => {
   const [, videoId] = match;
   const [videoResponse] = await fetchAndCache(`https://coub.com/api/v2/coubs/${videoId}.json`);
-  const video = await videoResponse.json();
+  const video: any = await videoResponse.json();
   console.log(video);
 
   if (video.file_versions?.share?.default)
