@@ -95,6 +95,7 @@ function indexRoute(event: FetchEvent, userAgent: string | null): Response {
         <html lang="en">
           <head>
             <title>${serviceName}</title>
+            ${isTelegram ? `<meta property="og:site_name" content="${serviceName}" />` : ''}
             <meta content="${serviceName}" property="og:title" />
             <meta
               content="${[
@@ -108,7 +109,7 @@ function indexRoute(event: FetchEvent, userAgent: string | null): Response {
             <meta content="${repoURL}" property="og:url" />
             <meta content="https://get.snaz.in/${isTelegram ? '8rEHmgH' : '9BVtA8t'}.png" property="og:image">
             <meta content="#fc2929" data-react-helmet="true" name="theme-color" />
-            <meta http-equiv="refresh" content="0; url=${repoURL}" />
+            ${isTelegram ? '' : `<meta http-equiv="refresh" content="0; url=${repoURL}" />`}
           </head>
           <body>
             Redirecting you to this service's Github Repository: <a href="${repoURL}">${repoURL}</a>
