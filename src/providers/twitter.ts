@@ -43,7 +43,6 @@ async function getGuestToken(): Promise<string> {
 export const extract: Provider['extract'] = async (match, url, _, debug) => {
   const [, statusId] = match;
   const token = await getGuestToken();
-  console.log(token);
 
   const query = new URLSearchParams({
     cards_platform: 'Web-12',
