@@ -1,6 +1,5 @@
 import { Provider } from '../types';
 import { fetchAndCache, redirectDebug } from '../util';
-declare const VEF_CACHE: KVNamespace;
 
 export const title = 'Twitter';
 export const domains = [
@@ -25,8 +24,6 @@ async function extractFromVMap(vmapUrl: string) {
 }
 
 async function getGuestToken(): Promise<string> {
-  const cached = await VEF_CACHE.get('twitter:guest_token');
-  if (cached) return cached;
   const [tokenResponse] = await fetchAndCache('https://api.twitter.com/1.1/guest/activate.json', {
     method: 'POST',
     headers: {
@@ -35,8 +32,7 @@ async function getGuestToken(): Promise<string> {
     }
   });
   const token: { guest_token: string } = await tokenResponse.json();
-  console.log(`Got new guest token (${token.guest_token})`);
-  await VEF_CACHE.put('twitter:guest_token', token.guest_token, { expirationTtl: 60 * 60 * 24 * 7 });
+  console.log(`Got guest token (${token.guest_token})`);
   return token.guest_token;
 }
 

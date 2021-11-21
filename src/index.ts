@@ -21,7 +21,7 @@ async function handleRequest(event: FetchEvent): Promise<Response> {
 
   const userAgent = event.request.headers.get('user-agent');
   const url = new URL(event.request.url);
-  let finalURL = url.pathname.replace(/^\/+/, '');
+  let finalURL = url.pathname.slice(1);
   let debugMode = false;
 
   if (url.pathname === '/') return indexRoute(event, userAgent);
