@@ -260,7 +260,8 @@ function embedResponse(event: FetchEvent, result: ProviderResponse, provider: Pr
       </html>`,
     {
       headers: {
-        'content-type': 'text/html;charset=UTF-8'
+        'content-type': 'text/html;charset=UTF-8',
+        'cache-control': 'public, no-transform, max-age=86400'
       }
     }
   );
