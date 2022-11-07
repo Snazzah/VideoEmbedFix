@@ -14,7 +14,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^3.18.0",
     "@types/common-tags": "^1.8.1",
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.41.0",
     "common-tags": "^1.8.2",
     "eslint": "^8.26.0",
